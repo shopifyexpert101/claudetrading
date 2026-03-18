@@ -38,6 +38,19 @@ from utils.helpers import classify_asset
 
 logger = logging.getLogger("trading_bot")
 
+# Dashboard integration (lazy import to avoid circular deps)
+_dashboard = None
+
+def _init_dashboard():
+    global _dashboard
+    from dashboard import state as dash_state, record_alert, record_signal, start_dashboard
+    _dashboard = {
+        "state": dash_state,
+        "record_alert": record_alert,
+        "record_signal": record_signal,
+        "start": start_dashboard,
+    }
+
 
 class TradingAlertBot:
     """Main application orchestrator."""
@@ -91,6 +104,14 @@ class TradingAlertBot:
         logger.info("Trading Alert Bot starting%s", " (DRY RUN)" if self.dry_run else "")
         logger.info("=" * 60)
 
+        # Update dashboard state
+        if _dashboard:
+            from datetime import datetime, timezone as tz
+            _dashboard["state"].bot_running = True
+            _dashboard["state"].dry_run = self.dry_run
+            _dashboard["state"].start_time = datetime.now(tz.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+            _dashboard["state"].config = self.config
+
         # Initialize notifiers
         if self.telegram and not self.dry_run:
             await self.telegram.initialize()
@@ -103,6 +124,14 @@ class TradingAlertBot:
         if not self.feed.all_symbols:
             logger.error("No symbols discovered. Check exchange configuration.")
             return
+
+        # Push symbol list to dashboard
+        if _dashboard:
+            _dashboard["state"].symbols_count = len(self.feed.all_symbols)
+            _dashboard["state"].symbols = [
+                {"symbol": s, "exchange": info.get("exchange", ""), "asset_class": info.get("asset_class", "")}
+                for s, info in list(self.feed.all_symbols.items())[:500]
+            ]
 
         # Set candle callback
         self.feed.set_candle_callback(self._on_candle)
@@ -225,6 +254,10 @@ class TradingAlertBot:
             weights=weights,
         )
 
+        # Record signal detection for dashboard
+        if _dashboard:
+            _dashboard["record_signal"]()
+
         if confidence.total < min_confidence:
             logger.debug(
                 "Signal %s on %s below confidence threshold (%.1f < %.1f)",
@@ -295,6 +328,25 @@ class TradingAlertBot:
 
         # Record for dedup
         self.deduper.record_send(symbol, signal_type)
+
+        # Push to dashboard
+        if _dashboard:
+            _dashboard["record_alert"]({
+                "symbol": symbol,
+                "direction": direction,
+                "signal_type": signal_type,
+                "exchange": exchange,
+                "asset_class": asset_class,
+                "description": description,
+                "confidence": round(confidence.total, 1),
+                "entry": price,
+                "stop_loss": levels.stop_loss,
+                "tp1": levels.tp1,
+                "tp2": levels.tp2,
+                "tp3": levels.tp3,
+                "sentiment": sentiment_label,
+            })
+
         logger.info(
             "Alert sent: %s %s %s (confidence: %.1f%%)",
             symbol, direction, signal_type, confidence.total,
@@ -328,6 +380,10 @@ class TradingAlertBot:
                                 min_confidence,
                             )
 
+                # Push sentiment to dashboard
+                if _dashboard:
+                    _dashboard["state"].sentiment_cache = dict(self._sentiment_cache)
+
                 logger.info(
                     "Sentiment update: %d signals from %d cached scores",
                     len(signals), len(self._sentiment_cache),
@@ -339,6 +395,8 @@ class TradingAlertBot:
 
     async def stop(self):
         """Graceful shutdown."""
+        if _dashboard:
+            _dashboard["state"].bot_running = False
         logger.info("Shutting down Trading Alert Bot...")
         await self.feed.stop()
         if self.telegram:
@@ -403,7 +461,21 @@ async def main():
         "--config", type=str, default="config.yaml",
         help="Path to config file",
     )
+    parser.add_argument(
+        "--dashboard", action="store_true",
+        help="Launch live web dashboard on port 5050",
+    )
+    parser.add_argument(
+        "--dashboard-port", type=int, default=5050,
+        help="Dashboard port (default: 5050)",
+    )
     args = parser.parse_args()
+
+    # Start dashboard if requested
+    if args.dashboard:
+        _init_dashboard()
+        _dashboard["start"](port=args.dashboard_port)
+        logger.info("Dashboard available at http://localhost:%d", args.dashboard_port)
 
     config = load_config(args.config)
     env = load_env()
