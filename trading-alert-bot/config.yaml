@@ -1,0 +1,121 @@
+# ============================================
+# Trading Alert Bot — Configuration
+# ============================================
+
+exchanges:
+  binance:
+    enabled: true
+    quote_currencies: [USDT, BTC, ETH, BNB]
+    min_24h_volume_usd: 5000000
+    markets: [spot, futures]
+    timeframe: 5m
+    higher_timeframe: 1h
+
+  markets_com:
+    enabled: true
+    poll_interval_sec: 10
+    timeframe: 5m
+    higher_timeframe: 1h
+    fallback_to_yfinance: true
+
+signals:
+  spike:
+    spike_pct: 2.0
+    volume_multiplier: 2.0
+
+  rsi:
+    period: 14
+    rsi_oversold: 30
+    rsi_overbought: 70
+
+  macd:
+    fast: 12
+    slow: 26
+    signal: 9
+
+  bollinger:
+    period: 20
+    std_dev: 2.0
+
+  ema_crossover:
+    fast_period: 9
+    slow_period: 21
+
+  support_resistance:
+    sr_lookback_periods: 100
+
+  sentiment:
+    news_poll_interval_min: 15
+    sentiment_bullish: 0.5
+    sentiment_bearish: -0.5
+    use_finbert: true
+    finbert_timeout_sec: 30
+    sources:
+      - newsapi
+      - finnhub
+      - alpha_vantage
+      - cryptopanic
+
+confidence:
+  min_confidence: 60
+  confidence_weights:
+    signal_strength: 0.30
+    volume_confirmation: 0.20
+    trend_alignment: 0.25
+    sentiment_alignment: 0.25
+
+sl_tp:
+  atr_period: 14
+  atr_multiplier_sl: 1.5
+  rr_tp1: 1.5
+  rr_tp2: 2.5
+  rr_tp3: 4.0
+
+notifications:
+  telegram:
+    enabled: true
+  whatsapp:
+    enabled: false
+
+rate_limiting:
+  dedupe_window_min: 30
+  max_alerts_per_hour: 60
+  max_alerts_per_asset_per_hour: 5
+
+asset_class_overrides:
+  crypto:
+    spike_pct: 3.0
+    volume_multiplier: 2.5
+    min_confidence: 55
+    rsi_oversold: 25
+    rsi_overbought: 75
+  forex:
+    spike_pct: 0.5
+    volume_multiplier: 1.5
+    min_confidence: 65
+    rsi_oversold: 30
+    rsi_overbought: 70
+  commodity:
+    spike_pct: 1.5
+    volume_multiplier: 2.0
+    min_confidence: 60
+    rsi_oversold: 30
+    rsi_overbought: 70
+  index:
+    spike_pct: 1.0
+    volume_multiplier: 1.8
+    min_confidence: 60
+    rsi_oversold: 30
+    rsi_overbought: 70
+  stock:
+    spike_pct: 2.0
+    volume_multiplier: 2.0
+    min_confidence: 60
+    rsi_oversold: 30
+    rsi_overbought: 70
+
+logging:
+  level: INFO
+  file: alerts.log
+  max_size_mb: 50
+  backup_count: 5

@@ -1,0 +1,21 @@
+# Trading Alert Bot — Dependencies
+# Pin to stable versions
+
+ccxt==4.4.35
+websockets==13.1
+pandas==2.2.3
+pandas-ta==0.3.14b1
+numpy==1.26.4
+transformers==4.47.1
+torch==2.5.1
+vaderSentiment==3.3.2
+python-telegram-bot==21.9
+twilio==9.4.0
+APScheduler==3.10.4
+python-dotenv==1.0.1
+PyYAML==6.0.2
+aiohttp==3.11.11
+requests==2.32.3
+finnhub-python==2.4.20
+newsapi-python==0.2.7
+yfinance==0.2.51
