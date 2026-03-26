@@ -19,8 +19,7 @@ DEFAULT_INSTRUMENTS = {
     "AUD/USD": "AUDUSD=X", "GBP/JPY": "GBPJPY=X", "EUR/GBP": "EURGBP=X",
     "USD/CAD": "USDCAD=X", "NZD/USD": "NZDUSD=X", "USD/CHF": "USDCHF=X",
     # Commodities
-    "XAU/USD": "GC=F", "XAG/USD": "SI=F", "WTI": "CL=F",
-    "BRENT": "BZ=F", "NATGAS": "NG=F", "COPPER": "HG=F",
+    "XAG/USD": "SI=F", "NATGAS": "NG=F", "COPPER": "HG=F",
     # Indices
     "US30": "YM=F", "SPX500": "ES=F", "NAS100": "NQ=F",
     "UK100": "^FTSE", "GER40": "^GDAXI", "JPN225": "^N225",
