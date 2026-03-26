@@ -143,13 +143,35 @@ SYMBOL_KEYWORDS: dict[str, list[str]] = {
     "EUR/USD": ["euro", "eur/usd", "eurusd"],
     "GBP/USD": ["pound", "sterling", "gbp/usd", "gbpusd"],
     "USD/JPY": ["yen", "usd/jpy", "usdjpy"],
-    "AAPL": ["apple", "aapl"],
-    "TSLA": ["tesla", "tsla"],
-    "NVDA": ["nvidia", "nvda"],
-    "AMZN": ["amazon", "amzn"],
-    "MSFT": ["microsoft", "msft"],
-    "GOOGL": ["google", "alphabet", "googl"],
-    "META": ["meta", "facebook"],
+    # Utilities
+    "NEE": ["nextera", "nextera energy", "nee"],
+    "AEP": ["american electric power", "aep"],
+    "ED": ["consolidated edison", "con edison", "ed"],
+    "AWK": ["american water works", "awk"],
+    "MGE": ["mge energy", "mge"],
+    # Waste Management
+    "WM": ["waste management", "wm"],
+    "RSG": ["republic services", "rsg"],
+    "CWST": ["casella waste", "cwst"],
+    # Death Care
+    "SCI": ["service corporation", "sci"],
+    "CSV": ["carriage services", "csv"],
+    # Healthcare — Domestic Providers
+    "HCA": ["hca healthcare", "hca"],
+    "UHS": ["universal health services", "uhs"],
+    "ACHC": ["acadia healthcare", "achc"],
+    # Consumer Staples — Domestic
+    "KR": ["kroger", "kr"],
+    "SFM": ["sprouts farmers market", "sprouts", "sfm"],
+    # Domestic REITs
+    "EXR": ["extra space storage", "exr"],
+    "NHI": ["national health investors", "nhi"],
+    # Domestic Telecom & Infrastructure
+    "ATUS": ["altice usa", "altice", "atus"],
+    # Services
+    "IAA": ["iaa", "kar auction"],
+    # Domestic HVAC/Mechanical Services
+    "CNS": ["comfort systems", "comfort systems usa", "cns"],
     "US30": ["dow jones", "dow", "us30", "djia"],
     "SPX500": ["s&p 500", "s&p", "spx", "sp500"],
     "NAS100": ["nasdaq", "nas100", "ndx"],

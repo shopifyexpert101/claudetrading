@@ -24,10 +24,25 @@ DEFAULT_INSTRUMENTS = {
     "US30": "YM=F", "SPX500": "ES=F", "NAS100": "NQ=F",
     "UK100": "^FTSE", "GER40": "^GDAXI", "JPN225": "^N225",
     "AUS200": "^AXJO",
-    # Stocks
-    "AAPL": "AAPL", "TSLA": "TSLA", "NVDA": "NVDA",
-    "AMZN": "AMZN", "MSFT": "MSFT", "GOOGL": "GOOGL",
-    "META": "META",
+    # Stocks — Geopolitically Insulated
+    # Utilities
+    "NEE": "NEE", "AEP": "AEP", "ED": "ED", "AWK": "AWK", "MGE": "MGE",
+    # Waste Management
+    "WM": "WM", "RSG": "RSG", "CWST": "CWST",
+    # Death Care
+    "SCI": "SCI", "CSV": "CSV",
+    # Healthcare — Domestic Providers
+    "HCA": "HCA", "UHS": "UHS", "ACHC": "ACHC",
+    # Consumer Staples — Domestic
+    "KR": "KR", "SFM": "SFM",
+    # Domestic REITs
+    "EXR": "EXR", "NHI": "NHI",
+    # Domestic Telecom & Infrastructure
+    "ATUS": "ATUS",
+    # Services
+    "IAA": "IAA",
+    # Domestic HVAC/Mechanical Services
+    "CNS": "CNS",
     # Crypto CFDs
     "BTC/USD": "BTC-USD", "ETH/USD": "ETH-USD",
 }
