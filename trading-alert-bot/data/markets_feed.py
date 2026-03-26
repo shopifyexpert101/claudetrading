@@ -59,7 +59,7 @@ class MarketsFeed:
         self.api_key = api_key
         self.api_secret = api_secret
         self.account_id = account_id
-        self.poll_interval = config.get("poll_interval_sec", 10)
+        self.poll_interval = config.get("poll_interval_sec", 12600)
         self.symbols: dict[str, dict] = {}
         self.candle_buffers: dict[str, pd.DataFrame] = {}
         self._running = False
@@ -254,7 +254,7 @@ class MarketsFeed:
         """Start periodic polling for all instruments."""
         self._running = True
         self._poll_task = asyncio.create_task(self._poll_loop())
-        logger.info("Markets.com polling started (interval: %ds)", self.poll_interval)
+        logger.info("Markets.com polling started (interval: %.1fh)", self.poll_interval / 3600)
 
     async def _poll_loop(self):
         """Main polling loop."""
