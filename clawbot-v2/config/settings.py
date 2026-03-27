@@ -46,6 +46,7 @@ SYMBOL_MAP = {
 
 # ─── Schedule ───────────────────────────────────────────────
 SCAN_TIMES_UTC = [14, 16, 18, 20]  # 6pm-midnight Dubai
+SCAN_INTERVAL_SECONDS = 30         # Main loop check interval
 MAX_SCANS_PER_DAY = 4
 MAX_TRADES_PER_SCAN = 4
 
