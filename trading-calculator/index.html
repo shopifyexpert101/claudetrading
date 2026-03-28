@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Compounding Calculator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f1923;
+            color: #e0e6ed;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            color: #00e676;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7a8a99;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 800px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+        .panel {
+            background: #1a2632;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #263545;
+        }
+        .panel h2 {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #4fc3f7;
+        }
+        .input-group {
+            margin-bottom: 16px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.82rem;
+            color: #8899aa;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .input-row input[type="range"] {
+            flex: 1;
+        }
+        .input-row .value-display {
+            min-width: 60px;
+            text-align: right;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #00e676;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 6px;
+            background: #263545;
+            border-radius: 3px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #00e676;
+            cursor: pointer;
+            border: 2px solid #0f1923;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #00e676;
+            cursor: pointer;
+            border: 2px solid #0f1923;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            background: #0f1923;
+            border: 1px solid #263545;
+            border-radius: 8px;
+            color: #e0e6ed;
+            font-size: 1rem;
+            outline: none;
+        }
+        input[type="number"]:focus {
+            border-color: #00e676;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #0f1923;
+            border-radius: 10px;
+            padding: 14px;
+            border: 1px solid #263545;
+        }
+        .stat-card .label {
+            font-size: 0.75rem;
+            color: #7a8a99;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .stat-card .value {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        .stat-card .value.green { color: #00e676; }
+        .stat-card .value.blue { color: #4fc3f7; }
+        .stat-card .value.orange { color: #ffab40; }
+        .stat-card .value.red { color: #ff5252; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        thead th {
+            text-align: left;
+            padding: 10px 8px;
+            border-bottom: 2px solid #263545;
+            color: #7a8a99;
+            font-weight: 600;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            background: #1a2632;
+        }
+        tbody td {
+            padding: 9px 8px;
+            border-bottom: 1px solid #1e2d3d;
+        }
+        tbody tr:hover {
+            background: #1e2d3d;
+        }
+        .table-wrap {
+            max-height: 350px;
+            overflow-y: auto;
+            border-radius: 8px;
+        }
+        .table-wrap::-webkit-scrollbar { width: 6px; }
+        .table-wrap::-webkit-scrollbar-track { background: #0f1923; }
+        .table-wrap::-webkit-scrollbar-thumb { background: #263545; border-radius: 3px; }
+        .positive { color: #00e676; }
+        .negative { color: #ff5252; }
+        .disclaimer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #4a5568;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #1e2d3d;
+        }
+        .section-divider {
+            border: none;
+            border-top: 1px solid #263545;
+            margin: 20px 0;
+        }
+        .rr-info {
+            background: #0f1923;
+            border-radius: 10px;
+            padding: 12px 14px;
+            border: 1px solid #263545;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+        }
+        .rr-info span { color: #ffab40; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Trading Compounding Calculator</h1>
+        <p class="subtitle">Daily compounding at 2-4% with adjustable parameters</p>
+
+        <div class="grid">
+            <div class="panel">
+                <h2>Parameters</h2>
+
+                <div class="input-group">
+                    <label>Starting Balance ($)</label>
+                    <input type="number" id="startBalance" value="1000" min="100" step="100">
+                </div>
+
+                <div class="input-group">
+                    <label>Daily Return Target</label>
+                    <div class="input-row">
+                        <input type="range" id="dailyReturn" min="1" max="10" step="0.5" value="3">
+                        <span class="value-display" id="dailyReturnVal">3.0%</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Win Rate</label>
+                    <div class="input-row">
+                        <input type="range" id="winRate" min="30" max="95" step="1" value="65">
+                        <span class="value-display" id="winRateVal">65%</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Trades Per Day</label>
+                    <div class="input-row">
+                        <input type="range" id="tradesPerDay" min="1" max="20" step="1" value="5">
+                        <span class="value-display" id="tradesPerDayVal">5</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Risk Per Trade (% of balance)</label>
+                    <div class="input-row">
+                        <input type="range" id="riskPerTrade" min="0.5" max="10" step="0.5" value="2">
+                        <span class="value-display" id="riskPerTradeVal">2.0%</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Reward:Risk Ratio</label>
+                    <div class="input-row">
+                        <input type="range" id="rewardRisk" min="1" max="5" step="0.5" value="2">
+                        <span class="value-display" id="rewardRiskVal">2.0</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Time Period (trading days)</label>
+                    <div class="input-row">
+                        <input type="range" id="timePeriod" min="5" max="365" step="5" value="30">
+                        <span class="value-display" id="timePeriodVal">30</span>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <div class="rr-info">
+                    Expected daily return: <span id="expectedDaily">--</span><br>
+                    Avg profit per trade: <span id="avgProfit">--</span><br>
+                    Daily expectancy: <span id="dailyExpectancy">--</span>
+                </div>
+            </div>
+
+            <div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="label">Final Balance</div>
+                        <div class="value green" id="finalBalance">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Total Profit</div>
+                        <div class="value green" id="totalProfit">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Total Return</div>
+                        <div class="value blue" id="totalReturn">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Max Drawdown (est.)</div>
+                        <div class="value red" id="maxDrawdown">--</div>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-bottom: 20px;">
+                    <h2>Growth Chart</h2>
+                    <div class="chart-container">
+                        <canvas id="growthChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>Daily Breakdown</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Opening Bal.</th>
+                                    <th>Wins/Losses</th>
+                                    <th>Day P&L</th>
+                                    <th>Closing Bal.</th>
+                                    <th>Cumulative %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="disclaimer">
+            This calculator is for educational purposes only. Past performance does not guarantee future results.
+            Daily compounding assumes consistent execution and does not account for slippage, fees, or emotional factors.
+        </p>
+    </div>
+
+    <script>
+        const inputs = {
+            startBalance: document.getElementById('startBalance'),
+            dailyReturn: document.getElementById('dailyReturn'),
+            winRate: document.getElementById('winRate'),
+            tradesPerDay: document.getElementById('tradesPerDay'),
+            riskPerTrade: document.getElementById('riskPerTrade'),
+            rewardRisk: document.getElementById('rewardRisk'),
+            timePeriod: document.getElementById('timePeriod'),
+        };
+
+        const displays = {
+            dailyReturnVal: document.getElementById('dailyReturnVal'),
+            winRateVal: document.getElementById('winRateVal'),
+            tradesPerDayVal: document.getElementById('tradesPerDayVal'),
+            riskPerTradeVal: document.getElementById('riskPerTradeVal'),
+            rewardRiskVal: document.getElementById('rewardRiskVal'),
+            timePeriodVal: document.getElementById('timePeriodVal'),
+        };
+
+        let chart = null;
+
+        function formatCurrency(n) {
+            if (n >= 1e9) return '$' + (n / 1e9).toFixed(2) + 'B';
+            if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+            if (n >= 1e4) return '$' + n.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        function calculate() {
+            const startBalance = parseFloat(inputs.startBalance.value) || 1000;
+            const winRate = parseFloat(inputs.winRate.value) / 100;
+            const tradesPerDay = parseInt(inputs.tradesPerDay.value);
+            const riskPerTrade = parseFloat(inputs.riskPerTrade.value) / 100;
+            const rewardRisk = parseFloat(inputs.rewardRisk.value);
+            const days = parseInt(inputs.timePeriod.value);
+
+            // Per-trade expectancy: (winRate * reward) - (lossRate * risk)
+            const winAmount = riskPerTrade * rewardRisk;
+            const lossAmount = riskPerTrade;
+            const perTradeExpectancy = (winRate * winAmount) - ((1 - winRate) * lossAmount);
+            const dailyExpectedReturn = perTradeExpectancy * tradesPerDay;
+
+            // Update info panel
+            document.getElementById('expectedDaily').textContent =
+                (dailyExpectedReturn * 100).toFixed(2) + '%';
+            document.getElementById('avgProfit').textContent =
+                (perTradeExpectancy * 100).toFixed(3) + '% per trade';
+            document.getElementById('dailyExpectancy').textContent =
+                formatCurrency(startBalance * dailyExpectedReturn) + ' (day 1)';
+
+            // Simulate daily compounding
+            const balances = [startBalance];
+            const dailyData = [];
+            let balance = startBalance;
+            let maxBalance = startBalance;
+            let maxDrawdownPct = 0;
+
+            for (let day = 1; day <= days; day++) {
+                const openBalance = balance;
+                const expectedWins = Math.round(tradesPerDay * winRate);
+                const expectedLosses = tradesPerDay - expectedWins;
+
+                // Calculate day P&L based on expectancy applied to current balance
+                const dayPnl = balance * dailyExpectedReturn;
+                balance += dayPnl;
+
+                if (balance > maxBalance) maxBalance = balance;
+                const drawdown = (maxBalance - balance) / maxBalance;
+                if (drawdown > maxDrawdownPct) maxDrawdownPct = drawdown;
+
+                balances.push(balance);
+                dailyData.push({
+                    day,
+                    open: openBalance,
+                    wins: expectedWins,
+                    losses: expectedLosses,
+                    pnl: dayPnl,
+                    close: balance,
+                    cumPct: ((balance - startBalance) / startBalance) * 100,
+                });
+            }
+
+            // Estimate max drawdown from consecutive losses
+            const streakDrawdown = 1 - Math.pow(1 - riskPerTrade, Math.ceil(-Math.log(0.05) / -Math.log(1 - winRate)));
+            const estimatedMaxDD = Math.max(maxDrawdownPct, streakDrawdown);
+
+            // Update stats
+            document.getElementById('finalBalance').textContent = formatCurrency(balance);
+            document.getElementById('totalProfit').textContent = formatCurrency(balance - startBalance);
+            document.getElementById('totalReturn').textContent =
+                (((balance - startBalance) / startBalance) * 100).toFixed(1) + '%';
+            document.getElementById('maxDrawdown').textContent =
+                (estimatedMaxDD * 100).toFixed(1) + '%';
+
+            drawChart(balances, days);
+            fillTable(dailyData);
+        }
+
+        function drawChart(balances, days) {
+            const canvas = document.getElementById('growthChart');
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.parentElement.getBoundingClientRect();
+
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            const w = rect.width;
+            const h = rect.height;
+            const pad = { top: 20, right: 20, bottom: 40, left: 70 };
+            const plotW = w - pad.left - pad.right;
+            const plotH = h - pad.top - pad.bottom;
+
+            ctx.clearRect(0, 0, w, h);
+
+            const maxVal = Math.max(...balances);
+            const minVal = Math.min(...balances);
+            const range = maxVal - minVal || 1;
+
+            // Grid lines
+            ctx.strokeStyle = '#1e2d3d';
+            ctx.lineWidth = 1;
+            ctx.fillStyle = '#5a6a7a';
+            ctx.font = '11px -apple-system, sans-serif';
+            ctx.textAlign = 'right';
+
+            for (let i = 0; i <= 4; i++) {
+                const y = pad.top + plotH - (i / 4) * plotH;
+                const val = minVal + (i / 4) * range;
+                ctx.beginPath();
+                ctx.moveTo(pad.left, y);
+                ctx.lineTo(w - pad.right, y);
+                ctx.stroke();
+                ctx.fillText(formatCurrency(val), pad.left - 8, y + 4);
+            }
+
+            // X-axis labels
+            ctx.textAlign = 'center';
+            const step = Math.max(1, Math.floor(days / 6));
+            for (let i = 0; i <= days; i += step) {
+                const x = pad.left + (i / days) * plotW;
+                ctx.fillText('D' + i, x, h - pad.bottom + 20);
+            }
+
+            // Gradient fill
+            const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + plotH);
+            grad.addColorStop(0, 'rgba(0, 230, 118, 0.3)');
+            grad.addColorStop(1, 'rgba(0, 230, 118, 0.02)');
+
+            ctx.beginPath();
+            ctx.moveTo(pad.left, pad.top + plotH);
+            for (let i = 0; i < balances.length; i++) {
+                const x = pad.left + (i / days) * plotW;
+                const y = pad.top + plotH - ((balances[i] - minVal) / range) * plotH;
+                ctx.lineTo(x, y);
+            }
+            ctx.lineTo(pad.left + plotW, pad.top + plotH);
+            ctx.closePath();
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // Line
+            ctx.beginPath();
+            for (let i = 0; i < balances.length; i++) {
+                const x = pad.left + (i / days) * plotW;
+                const y = pad.top + plotH - ((balances[i] - minVal) / range) * plotH;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = '#00e676';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // End dot
+            const lastX = pad.left + plotW;
+            const lastY = pad.top + plotH - ((balances[balances.length - 1] - minVal) / range) * plotH;
+            ctx.beginPath();
+            ctx.arc(lastX, lastY, 5, 0, Math.PI * 2);
+            ctx.fillStyle = '#00e676';
+            ctx.fill();
+        }
+
+        function fillTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = data.map(d => `
+                <tr>
+                    <td>${d.day}</td>
+                    <td>${formatCurrency(d.open)}</td>
+                    <td>${d.wins}W / ${d.losses}L</td>
+                    <td class="${d.pnl >= 0 ? 'positive' : 'negative'}">${d.pnl >= 0 ? '+' : ''}${formatCurrency(Math.abs(d.pnl))}</td>
+                    <td>${formatCurrency(d.close)}</td>
+                    <td class="${d.cumPct >= 0 ? 'positive' : 'negative'}">${d.cumPct >= 0 ? '+' : ''}${d.cumPct.toFixed(1)}%</td>
+                </tr>
+            `).join('');
+        }
+
+        // Event listeners
+        function updateDisplays() {
+            displays.dailyReturnVal.textContent = parseFloat(inputs.dailyReturn.value).toFixed(1) + '%';
+            displays.winRateVal.textContent = inputs.winRate.value + '%';
+            displays.tradesPerDayVal.textContent = inputs.tradesPerDay.value;
+            displays.riskPerTradeVal.textContent = parseFloat(inputs.riskPerTrade.value).toFixed(1) + '%';
+            displays.rewardRiskVal.textContent = parseFloat(inputs.rewardRisk.value).toFixed(1);
+            displays.timePeriodVal.textContent = inputs.timePeriod.value;
+        }
+
+        Object.values(inputs).forEach(input => {
+            input.addEventListener('input', () => {
+                updateDisplays();
+                calculate();
+            });
+        });
+
+        window.addEventListener('resize', calculate);
+
+        // Initial calculation
+        updateDisplays();
+        calculate();
+    </script>
+</body>
+</html>
